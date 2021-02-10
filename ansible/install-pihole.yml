@@ -1,0 +1,25 @@
+- become: yes
+  hosts: all
+  name: install-pihole
+  gather_facts: yes
+  tasks:
+  - name: Download install.hole.sh for pihole
+    get_url:
+      url: https://install.pi-hole.net
+      dest: /etc/install.hole.sh
+  - name: Make install.sh executable
+    file:
+      dest: /etc/install.hole.sh
+      mode: a+x
+  - name: Creates /etc/pihole dir
+    ansible.builtin.file:
+      path: /etc/pihole
+      state: directory
+      mode: '0755'
+  - name: Create setupVars.conf
+    template:
+      src: setupVars.conf.j2
+      dest: /etc/pihole/setupVars.conf
+  - name: install-pihole
+    become: no
+    command: /etc/install.hole.sh --unattended

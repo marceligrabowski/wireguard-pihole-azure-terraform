@@ -1,0 +1,33 @@
+- become: yes
+  hosts: all
+  name: install-pivpn
+  tasks:
+   - name: Allow port 22 in firewall
+     ufw:
+      rule: allow
+      port: 22
+   - name: Allow port 6537 in firewall
+     ufw:
+      rule: allow
+      port: 6537
+   - name: Enable ufw
+     ufw:
+      state: enabled
+   - name: add hostname to hosts
+     ansible.builtin.lineinfile:
+      path: /etc/hosts
+      line: 127.0.0.1 {{ansible_hostname}}
+   - name: Download install.sh for pivpn
+     get_url:
+      url: https://install.pivpn.io
+      dest: /etc/install.sh
+   - name: Make install.sh executable
+     file:
+      dest: /etc/install.sh
+      mode: a+x
+   - name: Create options.conf
+     template:
+      src: options.conf.j2
+      dest: /etc/options.conf
+   - name: Install pivpn
+     command: /etc/install.sh --unattended /etc/options.conf
