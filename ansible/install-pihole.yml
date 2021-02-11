@@ -23,3 +23,32 @@
   - name: install-pihole
     become: no
     command: /etc/install.hole.sh --unattended
+  - name: change pihole password
+    command: pihole -a -p {{password}}
+  - name: add firewall rules for DNS port
+    ufw:
+      rule: allow
+      src: 10.6.0.0/24
+      port: '53'
+  - name: add firewall rules for 80 port
+    ufw:
+      rule: allow
+      src: 10.6.0.0/24
+      port: '80'
+  - name: add client
+    command: pivpn -a -n client
+  - name: Change client DNS setup
+    ansible.builtin.lineinfile:
+      path: '/home/{{ansible_user}}/configs/client.conf'
+      regexp: DNS
+      line: DNS = {{ansible_wg0.ipv4.address}}
+  - name: Change client DNS setup
+    ansible.builtin.lineinfile:
+      path: '/home/{{ansible_user}}/configs/client.conf'
+      regexp: AllowedIPs
+      line: AllowedIPs = {{ansible_wg0.ipv4.address}}/24
+  - name: Storing in a path relative to the playbook
+    ansible.builtin.fetch:
+      src: '/home/{{ansible_user}}/configs/client.conf'
+      dest: config/client.conf
+      flat: yes

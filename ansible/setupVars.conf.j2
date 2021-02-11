@@ -1,3 +1,4 @@
+BLOCKING_ENABLED=true
 PIHOLE_INTERFACE=wg0
 IPV4_ADDRESS={{ansible_wg0.ipv4.address}}/24
 IPV6_ADDRESS=
@@ -8,5 +9,3 @@ INSTALL_WEB_SERVER=true
 INSTALL_WEB_INTERFACE=true
 LIGHTTPD_ENABLED=true
 CACHE_SIZE=10000
-WEBPASSWORD={{((password | trim) | password_hash('sha256'))|password_hash('sha256')}}
-BLOCKING_ENABLED=true
